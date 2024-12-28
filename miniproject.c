@@ -1,90 +1,132 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-#define MAX_SEATS 10  // Define the maximum number of seats on the bus
+typedef struct {
+    int account_number;
+    char account_holder[100];
+    float balance;
+} Account;
 
-// Function to display seat availability
-void displaySeats(int seats[]) {
-    printf("\nSeat Availability:\n");
-    for (int i = 0; i < MAX_SEATS; i++) {
-        if (seats[i] == 1)
-            printf("Seat %d: Available\n", i + 1);
-        else
-            printf("Seat %d: Reserved\n", i + 1);
-    }
-}
+Account accounts[100];
+int account_count = 0;
 
-// Function to book a seat
-void bookSeat(int seats[]) {
-    int seatNumber;
-    printf("Enter seat number to book (1 to %d): ", MAX_SEATS);
-    scanf("%d", &seatNumber);
-
-    if (seatNumber < 1 || seatNumber > MAX_SEATS) {
-        printf("Invalid seat number!\n");
-    } else if (seats[seatNumber - 1] == 0) {
-        printf("Seat %d is already reserved.\n", seatNumber);
+void create_account() {
+    if (account_count < 100) {
+        printf("Enter account number: ");
+        scanf("%d", &accounts[account_count].account_number);
+        printf("Enter account holder's name: ");
+        scanf("%s", accounts[account_count].account_holder);
+        accounts[account_count].balance = 0;
+        account_count++;
+        printf("Account created successfully!\n");
     } else {
-        seats[seatNumber - 1] = 0;  // Mark the seat as reserved
-        printf("Seat %d has been successfully booked.\n", seatNumber);
-        generateTicket(seatNumber);  // Generate a ticket for the reserved seat
+        printf("Maximum number of accounts reached!\n");
     }
 }
 
-// Function to cancel a reservation
-void cancelReservation(int seats[]) {
-    int seatNumber;
-    printf("Enter seat number to cancel (1 to %d): ", MAX_SEATS);
-    scanf("%d", &seatNumber);
-
-    if (seatNumber < 1 || seatNumber > MAX_SEATS) {
-        printf("Invalid seat number!\n");
-    } else if (seats[seatNumber - 1] == 1) {
-        printf("Seat %d is not reserved.\n", seatNumber);
-    } else {
-        seats[seatNumber - 1] = 1;  // Mark the seat as available
-        printf("Reservation for Seat %d has been cancelled.\n", seatNumber);
-    }
-}
-
-// Function to generate a ticket for a reserved seat
-void generateTicket(int seatNumber) {
-    printf("\n--- TICKET ---\n");
-    printf("Seat Number: %d\n", seatNumber);
-    printf("Reservation Status: Confirmed\n");
-    printf("Thank you for booking with us!\n");
-}
-
-// Main menu to interact with the bus reservation system
-int main() {
-    int seats[MAX_SEATS] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};  // All seats are available initially
-    int choice;
-
-    while (1) {
-        printf("\n---- Bus Reservation System ----\n");
-        printf("1. Display Seat Availability\n");
-        printf("2. Book a Seat\n");
-        printf("3. Cancel a Reservation\n");
-        printf("4. Exit\n");
-        printf("Enter your choice (1-4): ");
-        scanf("%d", &choice);
-
-        switch (choice) {
-            case 1:
-                displaySeats(seats);
-                break;
-            case 2:
-                bookSeat(seats);
-                break;
-            case 3:
-                cancelReservation(seats);
-                break;
-            case 4:
-                printf("Thank you for using the Bus Reservation System! Goodbye.\n");
-                return 0;
-            default:
-                printf("Invalid choice! Please try again.\n");
+void deposit() {
+    int account_number;
+    float amount;
+    printf("Enter account number: ");
+    scanf("%d", &account_number);
+    for (int i = 0; i < account_count; i++) {
+        if (accounts[i].account_number == account_number) {
+            printf("Enter amount to deposit: ");
+            scanf("%f", &amount);
+            accounts[i].balance += amount;
+            printf("Deposit successful!\n");
+            return;
         }
     }
+    printf("Account not found!\n");
+}
 
+void withdraw() {
+    int account_number;
+    float amount;
+    printf("Enter account number: ");
+    scanf("%d", &account_number);
+    for (int i = 0; i < account_count; i++) {
+        if (accounts[i].account_number == account_number) {
+            printf("Enter amount to withdraw: ");
+            scanf("%f", &amount);
+            if (amount > accounts[i].balance) {
+                printf("Insufficient funds!\n");
+            } else {
+                accounts[i].balance -= amount;
+                printf("Withdrawal successful!\n");
+            }
+            return;
+        }
+    }
+    printf("Account not found!\n");
+}
+
+void display_account_details() {
+    int account_number;
+    printf("Enter account number: ");
+    scanf("%d", &account_number);
+    for (int i = 0; i < account_count; i++) {
+        if (accounts[i].account_number == account_number) {
+            printf("Account Number: %d\n", accounts[i].account_number);
+            printf("Account Holder: %s\n", accounts[i].account_holder);
+            printf("Balance: %.2f\n", accounts[i].balance);
+            return;
+        }
+    }
+    printf("Account not found!\n");
+}
+
+void generate_mini_statement() {
+    int account_number;
+    printf("Enter account number: ");
+    scanf("%d", &account_number);
+    for (int i = 0; i < account_count; i++) {
+        if (accounts[i].account_number == account_number) {
+            printf("Mini Statement:\n");
+            printf("Account Number: %d\n", accounts[i].account_number);
+            printf("Balance: %.2f\n", accounts[i].balance);
+            // Add transaction history here
+            return;
+        }
+    }
+    printf("Account not found!\n");
+}
+
+int main() {
+    int choice;
+    while (1) {
+        printf("\nBank Account Management System\n");
+        printf("1. Create Account\n");
+        printf("2. Deposit\n");
+        printf("3. Withdraw\n");
+        printf("4. Display Account Details\n");
+        printf("5. Generate Mini Statement\n");
+        printf("6. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                create_account();
+                break;
+            case 2:
+                deposit();
+                break;
+            case 3:
+                withdraw();
+                break;
+            case 4:
+                display_account_details();
+                break;
+            case 5:
+                generate_mini_statement();
+                break;
+            case 6:
+                printf("Exiting...\n");
+                return 0;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
     return 0;
 }
